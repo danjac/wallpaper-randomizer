@@ -2,7 +2,7 @@ use clap::{arg, command, value_parser};
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use std::ffi::OsStr;
+use std::ffi::{OsStr, OsString};
 use std::fs::DirEntry;
 use std::path::PathBuf;
 use std::process::Command;
@@ -16,9 +16,9 @@ enum Error {
 fn is_image_ext(ext: &OsStr) -> bool {
     ["jpg", "png"]
         .iter()
-        .map(OsStr::new)
-        .collect::<Vec<&OsStr>>()
-        .contains(&ext)
+        .map(OsString::from)
+        .collect::<Vec<OsString>>()
+        .contains(&ext.to_ascii_lowercase())
 }
 
 fn matches_image_path(result: Result<DirEntry, std::io::Error>) -> Option<PathBuf> {
