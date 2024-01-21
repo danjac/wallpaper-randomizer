@@ -6,9 +6,8 @@ use std::io::Error;
 use std::path::PathBuf;
 use std::process::Command;
 
-#[derive(PartialEq, Debug)]
 pub enum WallpaperError {
-    CommandError,
+    CommandError(Error),
     DirectoryNotFound,
     ImageNotFound,
 }
@@ -55,14 +54,14 @@ pub fn change_wallpaper(file_name: &PathBuf) -> Result<(), WallpaperError> {
             ("org.gnome.desktop.background", "picture-uri-dark"),
             ("org.gnome.desktop.screensaver", "picture-uri"),
         ] {
-            if let Err(_) = Command::new("gsettings")
+            if let Err(err) = Command::new("gsettings")
                 .arg("set")
                 .arg(schema)
                 .arg(key)
                 .arg(format!("file://{}", file_name))
                 .output()
             {
-                return Err(WallpaperError::CommandError);
+                return Err(WallpaperError::CommandError(err));
             }
         }
         Ok(())
