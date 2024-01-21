@@ -6,6 +6,7 @@ use std::io::Error;
 use std::path::PathBuf;
 use std::process::Command;
 
+#[derive(Debug)]
 pub enum WallpaperError {
     CommandError(Error),
     DirectoryNotFound,

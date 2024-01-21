@@ -16,7 +16,7 @@ fn main() {
         if let Ok(selected) = select_wallpaper(wallpaper_dir) {
             match change_wallpaper(&selected) {
                 Ok(_) => println!("New wallpaper set: {:?}", selected),
-                _ => println!("Unable to set wallpaper"),
+                Err(err) => println!("Unable to set wallpaper: {:?}", err),
             }
         } else {
             println!("No suitable image found")
