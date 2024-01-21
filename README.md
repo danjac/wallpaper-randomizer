@@ -5,5 +5,5 @@ Small utility for randomly selecting a Gnome desktop wallpaper
 
 ```bash
 
-cargo install --path $PATH
+cargo install --path .
 ```
