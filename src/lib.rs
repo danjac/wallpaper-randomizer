@@ -33,6 +33,19 @@ fn matches_image_path(result: Result<DirEntry, Error>) -> Option<PathBuf> {
     }
 }
 
+fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), WallpaperError> {
+    match Command::new("gsettings")
+        .arg("set")
+        .arg(schema)
+        .arg(key)
+        .arg(format!("file://{}", file_name))
+        .output()
+    {
+        Err(err) => Err(WallpaperError::CommandError(err)),
+        _ => Ok(()),
+    }
+}
+
 pub fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, WallpaperError> {
     if let Ok(wallpaper_dir) = wallpaper_dir.read_dir() {
         let file_names: Vec<PathBuf> = wallpaper_dir.filter_map(matches_image_path).collect();
@@ -55,15 +68,7 @@ pub fn change_wallpaper(file_name: &PathBuf) -> Result<(), WallpaperError> {
             ("org.gnome.desktop.background", "picture-uri-dark"),
             ("org.gnome.desktop.screensaver", "picture-uri"),
         ] {
-            if let Err(err) = Command::new("gsettings")
-                .arg("set")
-                .arg(schema)
-                .arg(key)
-                .arg(format!("file://{}", file_name))
-                .output()
-            {
-                return Err(WallpaperError::CommandError(err));
-            }
+            gsettings_set(schema, key, file_name)?
         }
         Ok(())
     } else {
