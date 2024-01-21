@@ -5,6 +5,5 @@ Small utility for randomly selecting a Gnome desktop wallpaper
 
 ```bash
 
-cargo build --release
-cp target/release/wallpaper-randomizer $PATH 
+cargo install --path $PATH
 ```
