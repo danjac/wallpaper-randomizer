@@ -4,11 +4,12 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::ffi::{OsStr, OsString};
 use std::fs::DirEntry;
+use std::io::Error;
 use std::path::PathBuf;
 use std::process::Command;
 
 #[derive(PartialEq, Debug)]
-enum Error {
+enum WallpaperError {
     CommandError,
     DirectoryNotFound,
     ImageNotFound,
@@ -22,7 +23,7 @@ fn is_image_ext(ext: &OsStr) -> bool {
         .contains(&ext.to_ascii_lowercase())
 }
 
-fn matches_image_path(result: Result<DirEntry, std::io::Error>) -> Option<PathBuf> {
+fn matches_image_path(result: Result<DirEntry, Error>) -> Option<PathBuf> {
     match result {
         Ok(entry) => match entry.path() {
             path => match path.extension() {
@@ -34,7 +35,7 @@ fn matches_image_path(result: Result<DirEntry, std::io::Error>) -> Option<PathBu
     }
 }
 
-fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, Error> {
+fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, WallpaperError> {
     if let Ok(wallpaper_dir) = wallpaper_dir.read_dir() {
         let file_names: Vec<PathBuf> = wallpaper_dir.filter_map(matches_image_path).collect();
         let mut rng = thread_rng();
@@ -42,14 +43,14 @@ fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, Error> {
         if let Some(selected) = file_names.choose(&mut rng) {
             Ok(selected.clone())
         } else {
-            Err(Error::ImageNotFound)
+            Err(WallpaperError::ImageNotFound)
         }
     } else {
-        Err(Error::DirectoryNotFound)
+        Err(WallpaperError::DirectoryNotFound)
     }
 }
 
-fn change_wallpaper(file_name: &PathBuf) -> Result<(), Error> {
+fn change_wallpaper(file_name: &PathBuf) -> Result<(), WallpaperError> {
     if let Some(file_name) = file_name.to_str() {
         for (schema, key) in vec![
             ("org.gnome.desktop.background", "picture-uri"),
@@ -63,12 +64,12 @@ fn change_wallpaper(file_name: &PathBuf) -> Result<(), Error> {
                 .arg(format!("file://{}", file_name))
                 .output()
             {
-                return Err(Error::CommandError);
+                return Err(WallpaperError::CommandError);
             }
         }
         Ok(())
     } else {
-        Err(Error::ImageNotFound)
+        Err(WallpaperError::ImageNotFound)
     }
 }
 
