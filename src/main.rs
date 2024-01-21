@@ -9,6 +9,7 @@ use std::process::Command;
 
 #[derive(PartialEq, Debug)]
 enum Error {
+    CommandError,
     DirectoryNotFound,
     ImageNotFound,
 }
@@ -48,21 +49,26 @@ fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, Error> {
     }
 }
 
-fn change_wallpaper(file_name: &PathBuf) {
+fn change_wallpaper(file_name: &PathBuf) -> Result<(), Error> {
     if let Some(file_name) = file_name.to_str() {
-        for setting in vec![
+        for (schema, key) in vec![
             ("org.gnome.desktop.background", "picture-uri"),
             ("org.gnome.desktop.background", "picture-uri-dark"),
             ("org.gnome.desktop.screensaver", "picture-uri"),
         ] {
-            Command::new("gsettings")
+            if let Err(_) = Command::new("gsettings")
                 .arg("set")
-                .arg(setting.0)
-                .arg(setting.1)
+                .arg(schema)
+                .arg(key)
                 .arg(format!("file://{}", file_name))
-                .spawn()
-                .expect("Error running setting");
+                .output()
+            {
+                return Err(Error::CommandError);
+            }
         }
+        Ok(())
+    } else {
+        Err(Error::ImageNotFound)
     }
 }
 
@@ -77,8 +83,10 @@ fn main() {
 
     if let Some(wallpaper_dir) = matches.get_one::<PathBuf>("dir") {
         if let Ok(selected) = select_wallpaper(wallpaper_dir) {
-            println!("selected path:{:?}", selected);
-            change_wallpaper(&selected);
+            match change_wallpaper(&selected) {
+                Ok(_) => println!("New wallpaper set: {:?}", selected),
+                _ => println!("Unable to set wallpaper"),
+            }
         } else {
             println!("No suitable image found")
         }
