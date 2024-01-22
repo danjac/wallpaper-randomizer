@@ -20,8 +20,8 @@ impl fmt::Display for WallpaperError {
         let message = match self {
             Self::CommandError(err) => format!("error trying to set GNOME setting: {}", err),
             Self::DirectoryNotFound => String::from("directory not found"),
-            Self::InvalidPath => String::from("does not appear to be valid path"),
             Self::ImageNotFound => String::from("unable to find a JPEG or PNG"),
+            Self::InvalidPath => String::from("does not appear to be valid path"),
         };
         write!(f, "{}", message)
     }
