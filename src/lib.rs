@@ -23,15 +23,12 @@ fn is_image_ext(ext: &OsStr) -> bool {
         .contains(&ext.to_ascii_lowercase())
 }
 
-fn matches_image_path(result: Result<DirEntry, Error>) -> Option<PathBuf> {
-    match result {
-        Ok(entry) => match entry.path() {
-            path => match path.extension() {
-                Some(ext) if is_image_ext(ext) => Some(path),
-                _ => None,
-            },
+fn matches_image_path(entry: DirEntry) -> Option<PathBuf> {
+    match entry.path() {
+        path => match path.extension() {
+            Some(ext) if is_image_ext(ext) => Some(path),
+            _ => None,
         },
-        _ => None,
     }
 }
 
@@ -51,7 +48,7 @@ pub fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, WallpaperErr
         .read_dir()
         .map_err(|_| WallpaperError::DirectoryNotFound)?;
 
-    let paths: Vec<PathBuf> = dir.filter_map(matches_image_path).collect();
+    let paths: Vec<PathBuf> = dir.flat_map(|e| e).filter_map(matches_image_path).collect();
 
     match paths.choose(&mut thread_rng()) {
         Some(path) => Ok(path.clone()),
