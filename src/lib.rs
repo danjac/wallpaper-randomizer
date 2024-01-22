@@ -1,6 +1,6 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsStr;
 use std::fmt;
 use std::fs::DirEntry;
 use std::io::Error;
@@ -30,11 +30,11 @@ impl fmt::Display for WallpaperError {
 const IMAGE_EXTENSIONS: [&str; 3] = ["jpg", "jpeg", "png"];
 
 fn is_image_ext(ext: &OsStr) -> bool {
-    IMAGE_EXTENSIONS
-        .iter()
-        .map(OsString::from)
-        .collect::<Vec<OsString>>()
-        .contains(&ext.to_ascii_lowercase())
+    if let Some(ext) = ext.to_ascii_lowercase().to_str() {
+        IMAGE_EXTENSIONS.contains(&ext)
+    } else {
+        false
+    }
 }
 
 fn matches_image_path(entry: DirEntry) -> Option<PathBuf> {
