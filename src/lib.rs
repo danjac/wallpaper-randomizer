@@ -25,11 +25,10 @@ fn is_image_ext(ext: &OsStr) -> bool {
 }
 
 fn matches_image_path(entry: DirEntry) -> Option<PathBuf> {
-    match entry.path() {
-        path => match path.extension() {
-            Some(ext) if is_image_ext(ext) => Some(path),
-            _ => None,
-        },
+    let path = entry.path();
+    match path.extension() {
+        Some(ext) if is_image_ext(ext) => Some(path),
+        _ => None,
     }
 }
 
