@@ -70,7 +70,7 @@ pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperErro
         ("org.gnome.desktop.background", "picture-uri-dark"),
         ("org.gnome.desktop.screensaver", "picture-uri"),
     ] {
-        gsettings_set(schema, key, &file_name)?
+        gsettings_set(schema, key, &file_name)?;
     }
     Ok(file_name)
 }
