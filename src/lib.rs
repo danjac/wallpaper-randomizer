@@ -44,11 +44,14 @@ fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), Wallpap
 }
 
 pub fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, WallpaperError> {
-    let dir = wallpaper_dir
+    let entries = wallpaper_dir
         .read_dir()
         .map_err(|_| WallpaperError::DirectoryNotFound)?;
 
-    let paths: Vec<PathBuf> = dir.flat_map(|e| e).filter_map(matches_image_path).collect();
+    let paths: Vec<PathBuf> = entries
+        .flat_map(|e| e)
+        .filter_map(matches_image_path)
+        .collect();
 
     match paths.choose(&mut thread_rng()) {
         Some(path) => Ok(path.clone()),
