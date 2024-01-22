@@ -12,10 +12,10 @@ fn main() {
         )
         .get_matches();
 
-    if let Some(wallpaper_dir) = matches.get_one::<PathBuf>("dir") {
-        if let Ok(selected) = select_wallpaper(wallpaper_dir) {
-            match change_wallpaper(&selected) {
-                Ok(_) => println!("New wallpaper set: {:?}", selected),
+    if let Some(dir) = matches.get_one::<PathBuf>("dir") {
+        if let Ok(path) = select_wallpaper(dir) {
+            match change_wallpaper(&path) {
+                Ok(path) => println!("New wallpaper set: {:?}", path),
                 Err(err) => println!("Unable to set wallpaper: {:?}", err),
             }
         } else {

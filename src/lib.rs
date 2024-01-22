@@ -63,8 +63,8 @@ pub fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, WallpaperErr
     }
 }
 
-pub fn change_wallpaper(file_name: &PathBuf) -> Result<(), WallpaperError> {
-    if let Some(file_name) = file_name.to_str() {
+pub fn change_wallpaper(path: &PathBuf) -> Result<&PathBuf, WallpaperError> {
+    if let Some(file_name) = path.to_str() {
         for (schema, key) in vec![
             ("org.gnome.desktop.background", "picture-uri"),
             ("org.gnome.desktop.background", "picture-uri-dark"),
@@ -72,7 +72,7 @@ pub fn change_wallpaper(file_name: &PathBuf) -> Result<(), WallpaperError> {
         ] {
             gsettings_set(schema, key, file_name)?
         }
-        Ok(())
+        Ok(path)
     } else {
         Err(WallpaperError::ImageNotFound)
     }
