@@ -54,13 +54,13 @@ fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
         .filter_map(matches_image_path)
         .collect();
 
-    match paths.choose(&mut thread_rng()) {
-        Some(path) => match path.to_str() {
-            Some(path) => Ok(path.to_string()),
-            _ => Err(WallpaperError::InvalidPath),
-        },
-        _ => Err(WallpaperError::ImageNotFound),
-    }
+    let file_name = paths
+        .choose(&mut thread_rng())
+        .ok_or(WallpaperError::ImageNotFound)?
+        .to_str()
+        .ok_or(WallpaperError::InvalidPath)?;
+
+    Ok(file_name.to_string())
 }
 
 pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
