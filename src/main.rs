@@ -1,7 +1,7 @@
 use clap::{arg, command, value_parser};
 
 use std::path::PathBuf;
-use wallpaper_randomizer::{change_wallpaper, select_wallpaper};
+use wallpaper_randomizer::change_wallpaper;
 
 fn main() {
     let matches = command!()
@@ -13,13 +13,11 @@ fn main() {
         .get_matches();
 
     if let Some(dir) = matches.get_one::<PathBuf>("dir") {
-        if let Ok(path) = select_wallpaper(dir) {
-            match change_wallpaper(&path) {
-                Ok(path) => println!("New wallpaper set: {:?}", path),
-                Err(err) => println!("Unable to set wallpaper: {:?}", err),
-            }
-        } else {
-            println!("No suitable image found")
+        match change_wallpaper(dir) {
+            Ok(path) => println!("New wallpaper set: {:?}", path),
+            Err(err) => println!("Unable to set wallpaper: {:?}", err),
         }
+    } else {
+        println!("No suitable image found")
     }
 }

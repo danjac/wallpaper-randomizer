@@ -11,6 +11,7 @@ pub enum WallpaperError {
     CommandError(Error),
     DirectoryNotFound,
     ImageNotFound,
+    InvalidPath,
 }
 
 const IMAGE_EXTENSIONS: [&str; 2] = ["jpg", "png"];
@@ -43,7 +44,7 @@ fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), Wallpap
     Ok(())
 }
 
-pub fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, WallpaperError> {
+fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
     let entries = wallpaper_dir
         .read_dir()
         .map_err(|_| WallpaperError::DirectoryNotFound)?;
@@ -54,20 +55,23 @@ pub fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, WallpaperErr
         .collect();
 
     match paths.choose(&mut thread_rng()) {
-        Some(path) => Ok(path.clone()),
+        Some(path) => match path.to_str() {
+            Some(path) => Ok(path.to_string()),
+            _ => Err(WallpaperError::InvalidPath),
+        },
         _ => Err(WallpaperError::ImageNotFound),
     }
 }
 
-pub fn change_wallpaper(path: &PathBuf) -> Result<&PathBuf, WallpaperError> {
-    let file_name = path.to_str().ok_or(WallpaperError::ImageNotFound)?;
+pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<&PathBuf, WallpaperError> {
+    let file_name = select_wallpaper(wallpaper_dir)?;
 
     for (schema, key) in vec![
         ("org.gnome.desktop.background", "picture-uri"),
         ("org.gnome.desktop.background", "picture-uri-dark"),
         ("org.gnome.desktop.screensaver", "picture-uri"),
     ] {
-        gsettings_set(schema, key, file_name)?
+        gsettings_set(schema, key, &file_name)?
     }
-    Ok(path)
+    Ok(wallpaper_dir)
 }
