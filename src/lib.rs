@@ -50,13 +50,10 @@ fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), Wallpap
 
 pub fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<PathBuf, WallpaperError> {
     if let Ok(wallpaper_dir) = wallpaper_dir.read_dir() {
-        let file_names: Vec<PathBuf> = wallpaper_dir.filter_map(matches_image_path).collect();
-        let mut rng = thread_rng();
-
-        if let Some(selected) = file_names.choose(&mut rng) {
-            Ok(selected.clone())
-        } else {
-            Err(WallpaperError::ImageNotFound)
+        let paths: Vec<PathBuf> = wallpaper_dir.filter_map(matches_image_path).collect();
+        match paths.choose(&mut thread_rng()) {
+            Some(path) => Ok(path.clone()),
+            _ => Err(WallpaperError::ImageNotFound),
         }
     } else {
         Err(WallpaperError::DirectoryNotFound)
