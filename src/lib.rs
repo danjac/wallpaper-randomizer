@@ -13,8 +13,10 @@ pub enum WallpaperError {
     ImageNotFound,
 }
 
+const IMAGE_EXTENSIONS: [&str; 2] = ["jpg", "png"];
+
 fn is_image_ext(ext: &OsStr) -> bool {
-    ["jpg", "png"]
+    IMAGE_EXTENSIONS
         .iter()
         .map(OsString::from)
         .collect::<Vec<OsString>>()
