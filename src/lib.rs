@@ -57,15 +57,15 @@ fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), Wallpap
 }
 
 fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
-    let entries = wallpaper_dir
+    // select all PNG and JPEG files in directory
+    let paths: Vec<PathBuf> = wallpaper_dir
         .read_dir()
-        .map_err(|_| WallpaperError::DirectoryNotFound)?;
-
-    let paths: Vec<PathBuf> = entries
-        .flat_map(|e| e)
+        .map_err(|_| WallpaperError::DirectoryNotFound)?
+        .flatten()
         .filter_map(matches_image_path)
         .collect();
 
+    // choose one path at random
     let file_name = paths
         .choose(&mut thread_rng())
         .ok_or(WallpaperError::ImageNotFound)?
@@ -76,6 +76,7 @@ fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
 }
 
 pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
+    // select a random wallpaper path and apply Gnome desktop settings
     let file_name = select_wallpaper(wallpaper_dir)?;
 
     for (schema, key) in vec![
