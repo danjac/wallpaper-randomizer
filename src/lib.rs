@@ -37,8 +37,7 @@ fn is_image_ext(ext: &OsStr) -> bool {
     }
 }
 
-fn matches_image_path(entry: DirEntry) -> Option<PathBuf> {
-    let path = entry.path();
+fn matches_image_path(path: PathBuf) -> Option<PathBuf> {
     match path.extension() {
         Some(ext) if is_image_ext(ext) => Some(path),
         _ => None,
@@ -62,6 +61,7 @@ fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
         .read_dir()
         .map_err(|_| WallpaperError::DirectoryNotFound)?
         .flatten()
+        .map(|e| e.path())
         .filter_map(matches_image_path)
         .collect();
 
