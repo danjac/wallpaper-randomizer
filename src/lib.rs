@@ -1,6 +1,7 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::ffi::{OsStr, OsString};
+use std::fmt;
 use std::fs::DirEntry;
 use std::io::Error;
 use std::path::PathBuf;
@@ -14,7 +15,19 @@ pub enum WallpaperError {
     InvalidPath,
 }
 
-const IMAGE_EXTENSIONS: [&str; 2] = ["jpg", "png"];
+impl fmt::Display for WallpaperError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let message = match self {
+            Self::CommandError(err) => format!("error trying to set GNOME setting: {}", err),
+            Self::DirectoryNotFound => String::from("directory not found"),
+            Self::InvalidPath => String::from("does not appear to be valid path"),
+            Self::ImageNotFound => String::from("unable to find a JPEG or PNG"),
+        };
+        write!(f, "{}", message)
+    }
+}
+
+const IMAGE_EXTENSIONS: [&str; 3] = ["jpg", "jpeg", "png"];
 
 fn is_image_ext(ext: &OsStr) -> bool {
     IMAGE_EXTENSIONS
