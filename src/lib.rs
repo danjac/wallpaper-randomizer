@@ -63,7 +63,7 @@ fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
     }
 }
 
-pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<&PathBuf, WallpaperError> {
+pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
     let file_name = select_wallpaper(wallpaper_dir)?;
 
     for (schema, key) in vec![
@@ -73,5 +73,5 @@ pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<&PathBuf, WallpaperEr
     ] {
         gsettings_set(schema, key, &file_name)?
     }
-    Ok(wallpaper_dir)
+    Ok(file_name)
 }
