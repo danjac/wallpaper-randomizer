@@ -2,7 +2,6 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::ffi::OsStr;
 use std::fmt;
-use std::fs::DirEntry;
 use std::io::Error;
 use std::path::PathBuf;
 use std::process::Command;
