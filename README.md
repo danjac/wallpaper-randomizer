@@ -8,6 +8,18 @@ Small utility for randomly selecting a Gnome desktop wallpaper
 cargo install --path .
 ```
 
+## Run
+
+```bash
+
+Usage: wallpaper-randomizer --dir <DIR>
+
+Options:
+  -d, --dir <DIR>  
+  -h, --help       Print help
+  -V, --version    Print version
+```
+
 ## Timer
 
 This application can be run using systemd. Once you have built the executable, in your user systemd directory (check your distro docs on where this is) create a service file e.g.  `$HOME/.local/share/systemd/user/wallpaper_randomizer.service`:
