@@ -10,7 +10,7 @@ cargo install --path .
 
 ## Timer
 
-This application can be run using systemd. In your user systemd directory (check your distro docs on where this is) create a service file e.g.  `$HOME/.local/share/systemd/user/wallpaper_randomizer.service`:
+This application can be run using systemd. Once you have built the executable, in your user systemd directory (check your distro docs on where this is) create a service file e.g.  `$HOME/.local/share/systemd/user/wallpaper_randomizer.service`:
 
 ```bash
 
