@@ -78,7 +78,7 @@ pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperErro
     // select a random wallpaper path and apply Gnome desktop settings
     let file_name = select_wallpaper(wallpaper_dir)?;
 
-    for (schema, key) in vec![
+    for (schema, key) in [
         ("org.gnome.desktop.background", "picture-uri"),
         ("org.gnome.desktop.background", "picture-uri-dark"),
         ("org.gnome.desktop.screensaver", "picture-uri"),
