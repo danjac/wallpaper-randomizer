@@ -3,7 +3,7 @@ use rand::thread_rng;
 use std::ffi::OsStr;
 use std::fmt;
 use std::io::Error;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 #[derive(Debug)]
@@ -50,11 +50,11 @@ fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), Wallpap
         .arg(key)
         .arg(format!("file://{}", file_name))
         .output()
-        .map_err(|e| WallpaperError::CommandError(e))?;
+        .map_err(WallpaperError::CommandError)?;
     Ok(())
 }
 
-fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
+fn select_wallpaper(wallpaper_dir: &Path) -> Result<String, WallpaperError> {
     // select all PNG and JPEG files in directory
     let paths: Vec<PathBuf> = wallpaper_dir
         .read_dir()
@@ -74,7 +74,7 @@ fn select_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
     Ok(file_name.to_string())
 }
 
-pub fn change_wallpaper(wallpaper_dir: &PathBuf) -> Result<String, WallpaperError> {
+pub fn change_wallpaper(wallpaper_dir: &Path) -> Result<String, WallpaperError> {
     // select a random wallpaper path and apply Gnome desktop settings
     let file_name = select_wallpaper(wallpaper_dir)?;
 
