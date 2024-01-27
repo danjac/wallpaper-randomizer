@@ -1,21 +1,21 @@
-use clap::{arg, command, value_parser};
+use clap::Parser;
 
 use std::path::PathBuf;
 use wallpaper_randomizer::change_wallpaper;
 
-fn main() {
-    let matches = command!()
-        .arg(
-            arg!(-d --dir <DIR>)
-                .required(true)
-                .value_parser(value_parser!(PathBuf)),
-        )
-        .get_matches();
+/// Randomly select a Gnome wallpaper.
+///
+/// Only JPEG and PNG images are supported.
+#[derive(Parser)]
+#[command(version)]
+struct Cli {
+    dir: PathBuf,
+}
 
-    if let Some(dir) = matches.get_one::<PathBuf>("dir") {
-        match change_wallpaper(dir) {
-            Ok(path) => println!("New wallpaper set: {path}"),
-            Err(err) => eprintln!("Cannot set wallpaper: {err}"),
-        }
+fn main() {
+    let cli = Cli::parse();
+    match change_wallpaper(&cli.dir) {
+        Ok(path) => println!("New wallpaper set: {path}"),
+        Err(err) => eprintln!("Cannot set wallpaper: {err}"),
     }
 }
