@@ -29,11 +29,8 @@ impl fmt::Display for WallpaperError {
 const IMAGE_EXTENSIONS: [&str; 3] = ["jpg", "jpeg", "png"];
 
 fn is_image_ext(ext: &OsStr) -> bool {
-    if let Some(ext) = ext.to_ascii_lowercase().to_str() {
-        IMAGE_EXTENSIONS.contains(&ext)
-    } else {
-        false
-    }
+    ext.to_str()
+        .is_some_and(|ext| IMAGE_EXTENSIONS.contains(&ext.to_ascii_lowercase().as_str()))
 }
 
 fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), WallpaperError> {
