@@ -38,13 +38,6 @@ fn is_image_ext(ext: &OsStr) -> bool {
         .is_some_and(|ext| IMAGE_EXTENSIONS.contains(&ext.to_ascii_lowercase().as_str()))
 }
 
-fn matches_image_path(path: PathBuf) -> Option<PathBuf> {
-    match path.extension() {
-        Some(ext) if is_image_ext(ext) => Some(path),
-        _ => None,
-    }
-}
-
 fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), WallpaperError> {
     let output = Command::new("gsettings")
         .arg("set")
@@ -70,8 +63,8 @@ fn select_wallpaper(wallpaper_dir: &Path) -> Result<String, WallpaperError> {
         .read_dir()
         .map_err(|_| WallpaperError::DirectoryNotFound)?
         .flatten()
-        .map(|e| e.path())
-        .filter_map(matches_image_path)
+        .map(|entry| entry.path())
+        .filter(|path| path.extension().is_some_and(is_image_ext))
         .collect();
 
     // choose one path at random
