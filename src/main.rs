@@ -15,7 +15,7 @@ fn main() {
     if let Some(dir) = matches.get_one::<PathBuf>("dir") {
         match change_wallpaper(dir) {
             Ok(path) => println!("New wallpaper set: {}", path),
-            Err(err) => println!("Cannot set wallpaper: {}", err),
+            Err(err) => eprintln!("Cannot set wallpaper: {}", err),
         }
     }
 }
