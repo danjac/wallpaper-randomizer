@@ -49,7 +49,7 @@ fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), Wallpap
         .arg(key)
         .arg(format!("file://{}", file_name))
         .output()
-        .map_err(|e| WallpaperError::CommandError(e))?;
+        .map_err(WallpaperError::CommandError)?;
     Ok(())
 }
 
