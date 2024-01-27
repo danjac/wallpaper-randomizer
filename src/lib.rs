@@ -2,13 +2,14 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::ffi::OsStr;
 use std::fmt;
-use std::io::Error;
+use std::io;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 #[derive(Debug)]
 pub enum WallpaperError {
-    CommandError(Error),
+    CommandIo(io::Error),
+    CommandFailed(Vec<u8>),
     DirectoryNotFound,
     ImageNotFound,
     InvalidPath,
@@ -17,7 +18,12 @@ pub enum WallpaperError {
 impl fmt::Display for WallpaperError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::CommandError(err) => write!(f, "error trying to set GNOME setting: {err}"),
+            Self::CommandIo(err) => write!(f, "error trying to set GNOME setting: {err}"),
+            Self::CommandFailed(err) => write!(
+                f,
+                "error trying to set GNOME setting: {}",
+                String::from_utf8_lossy(err)
+            ),
             Self::DirectoryNotFound => write!(f, "directory not found"),
             Self::ImageNotFound => write!(f, "unable to find a JPEG or PNG"),
             Self::InvalidPath => write!(f, "does not appear to be valid path"),
@@ -33,13 +39,20 @@ fn is_image_ext(ext: &OsStr) -> bool {
 }
 
 fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), WallpaperError> {
-    Command::new("gsettings")
+    let output = Command::new("gsettings")
         .arg("set")
         .arg(schema)
         .arg(key)
-        .arg(format!("file://{}", file_name))
+        .arg(format!("file://{file_name}"))
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
         .output()
-        .map_err(WallpaperError::CommandError)?;
+        .map_err(WallpaperError::CommandIo)?;
+
+    if !output.status.success() {
+        return Err(WallpaperError::CommandFailed(output.stderr));
+    }
     Ok(())
 }
 
