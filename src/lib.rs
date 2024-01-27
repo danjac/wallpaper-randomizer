@@ -16,13 +16,12 @@ pub enum WallpaperError {
 
 impl fmt::Display for WallpaperError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let message = match self {
-            Self::CommandError(err) => format!("error trying to set GNOME setting: {}", err),
-            Self::DirectoryNotFound => String::from("directory not found"),
-            Self::ImageNotFound => String::from("unable to find a JPEG or PNG"),
-            Self::InvalidPath => String::from("does not appear to be valid path"),
-        };
-        write!(f, "{}", message)
+        match self {
+            Self::CommandError(err) => write!(f, "error trying to set GNOME setting: {err}"),
+            Self::DirectoryNotFound => write!(f, "directory not found"),
+            Self::ImageNotFound => write!(f, "unable to find a JPEG or PNG"),
+            Self::InvalidPath => write!(f, "does not appear to be valid path"),
+        }
     }
 }
 
