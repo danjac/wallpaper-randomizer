@@ -11,7 +11,7 @@ cargo install --path .
 ## Run
 
 ```bash
-Usage: wallpaper-randomizer --dir <DIR>
+Usage: wallpaper-randomizer <DIR>
 
 Options:
   -d, --dir <DIR>  
@@ -30,7 +30,7 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/home/USER/.cargo/bin/wallpaper-randomizer -d /home/USER/Pictures/Wallpapers
+ExecStart=/home/USER/.cargo/bin/wallpaper-randomizer /home/USER/Pictures/Wallpapers
 
 [Install]
 WantedBy=default.target
