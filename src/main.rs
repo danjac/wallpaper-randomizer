@@ -8,13 +8,15 @@ use wallpaper_randomizer::change_wallpaper;
 /// Only JPEG and PNG images are supported.
 #[derive(Parser)]
 #[command(version)]
+
 struct Cli {
     dir: PathBuf,
+    option: String,
 }
 
 fn main() {
     let cli = Cli::parse();
-    match change_wallpaper(&cli.dir) {
+    match change_wallpaper(&cli.dir, &cli.option) {
         Ok(path) => println!("New wallpaper set: {path}"),
         Err(err) => eprintln!("Cannot set wallpaper: {err}"),
     }

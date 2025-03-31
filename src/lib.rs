@@ -38,12 +38,16 @@ fn is_image_ext(ext: &OsStr) -> bool {
         .is_some_and(|ext| IMAGE_EXTENSIONS.contains(&ext.to_ascii_lowercase().as_str()))
 }
 
-fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), WallpaperError> {
+fn set_picture_uri(schema: &str, key: &str, file_name: &str) -> Result<(), WallpaperError> {
+    gsettings_set(schema, key, &format!("file://{file_name}"))
+}
+
+fn gsettings_set(schema: &str, key: &str, option: &str) -> Result<(), WallpaperError> {
     let output = Command::new("gsettings")
         .arg("set")
         .arg(schema)
         .arg(key)
-        .arg(format!("file://{file_name}"))
+        .arg(option)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::piped())
@@ -55,6 +59,7 @@ fn gsettings_set(schema: &str, key: &str, file_name: &str) -> Result<(), Wallpap
     }
     Ok(())
 }
+
 
 fn select_wallpaper(wallpaper_dir: &Path) -> Result<String, WallpaperError> {
     // select all PNG and JPEG files in directory
@@ -76,7 +81,7 @@ fn select_wallpaper(wallpaper_dir: &Path) -> Result<String, WallpaperError> {
     Ok(file_name.to_string())
 }
 
-pub fn change_wallpaper(wallpaper_dir: &Path) -> Result<String, WallpaperError> {
+pub fn change_wallpaper(wallpaper_dir: &Path, option: &str) -> Result<String, WallpaperError> {
     // select a random wallpaper path and apply Gnome desktop settings
     let file_name = select_wallpaper(wallpaper_dir)?;
 
@@ -85,7 +90,13 @@ pub fn change_wallpaper(wallpaper_dir: &Path) -> Result<String, WallpaperError> 
         ("org.gnome.desktop.background", "picture-uri-dark"),
         ("org.gnome.desktop.screensaver", "picture-uri"),
     ] {
-        gsettings_set(schema, key, &file_name)?;
+        set_picture_uri(schema, key, &file_name)?;
+    }
+    for (schema, key) in [
+        ("org.gnome.desktop.background", "picture-options"),
+        ("org.gnome.desktop.screensaver", "picture-options"),
+    ] {
+        gsettings_set(schema, key, option)?;
     }
     Ok(file_name)
 }
